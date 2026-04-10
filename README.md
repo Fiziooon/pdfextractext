@@ -49,3 +49,32 @@ pdf-extractor/
 ├── .gitignore            # Archivos ignorados por Git
 ├── pyproject.toml        # Configuración de UV y dependencias
 └── README.md             # Documentación del proyecto
+
+### 🚀 Configuración del Proyecto
+
+Sigue estos pasos para preparar tu entorno de desarrollo local:
+
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/Fiziooon/pdfextractext.git](https://github.com/Fiziooon/pdfextractext.git)
+cd pdfextractext
+```
+
+### 2. Instalar dependencias y entorno virtual
+Utilizamos `uv` para una gestión ultra rápida de paquetes:
+```bash
+uv sync
+```
+
+### 3. Activar el entorno virtual
+* **Windows (Git Bash):** `source .venv/Scripts/activate`
+* **Windows (PowerShell):** `.venv\Scripts\Activate.ps1`
+* **Linux / macOS:** `source .venv/bin/activate`
+
+### 4. Ejecutar el servidor de desarrollo
+Lanza la API con recarga automática para ver tus cambios en tiempo real:
+```bash
+uv run uvicorn src.api.main:app --reload
+```
+La API estará disponible en: `http://127.0.0.1:8000` 🌐
+```
