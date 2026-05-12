@@ -7,7 +7,6 @@ class MongoDB:
         self.db = None
 
     async def connect(self):
-        # Usamos la URL que Pydantic validó desde el entorno
         self.client = AsyncIOMotorClient(settings.mongo_url)
         self.db = self.client.pdf_database 
         print(f"Conectado a MongoDB en: {settings.mongo_url.split('@')[-1]}")
