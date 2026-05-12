@@ -7,22 +7,37 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_pdf(file: UploadFile = File(...)):
+
     if file.content_type != "application/pdf":
-        raise HTTPException(status_code=400, detail="El archivo debe ser un PDF")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="El archivo debe ser un PDF"
+        )
 
     pdf_bytes = await file.read()
     if len(pdf_bytes) > 5 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="El archivo es demasiado grande")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="El archivo es demasiado grande (máximo 5MB)"
+        )
 
     checksum = get_pdf_checksum(pdf_bytes)
-    
     db = db_connection.db
+    
     existing_doc = await db["processed_pdfs"].find_one({"checksum": checksum})
     if existing_doc:
-        raise HTTPException(status_code=400, detail="El documento ya ha sido procesado anteriormente")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Este documento ya ha sido procesado anteriormente"
+        )
 
-    text_content = extract_text_from_pdf(pdf_bytes)
-
+    try:
+        text_content = extract_text_from_pdf(pdf_bytes)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="Error al extraer texto del PDF"
+        )
 
     new_doc = DocumentCreate(
         filename=file.filename,
@@ -33,4 +48,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     await db["processed_pdfs"].insert_one(new_doc.model_dump())
 
-    return {"message": "PDF procesado exitosamente", "filename": file.filename}
+    return {
+        "message": "Archivo recibido y procesado exitosamente", 
+        "filename": file.filename
+    }
